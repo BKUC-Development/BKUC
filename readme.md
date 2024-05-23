@@ -65,6 +65,4 @@ Dependencies from vcpkg:
 
 `minhook:x64-windows-static`
 
-`imgui:x64-windows-static`
-
 `imgui[core,dx10-binding,dx11-binding,win32-binding]:x64-windows-static`
