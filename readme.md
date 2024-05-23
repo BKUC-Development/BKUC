@@ -32,7 +32,7 @@ We are not encouraging modding or cheating with this repository. It is purely fo
 > If you like our work feel free to send some money our way so we can buy a coffee.
 > We will be thankful! All Donations will be spread evenly among developers (excluding former / resigned).
 >
-> Kofi: https://ko-fi.com/hkzk0
+> Ko-fi (Stripe): https://ko-fi.com/hkzk0
 
 > ## Features: [OUTDATED]
 > - AimBot
