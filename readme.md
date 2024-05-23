@@ -33,6 +33,7 @@ We are not encouraging modding or cheating with this repository. It is purely fo
 > We will be thankful! All Donations will be spread evenly among developers (excluding former / resigned).
 >
 > Ko-fi (Stripe): https://ko-fi.com/hkzk0
+> (Or if you still want to give stan some support for this: https://donate.stripe.com/dR63fk8ys7OF1k4eUU)
 
 > ## Features: [OUTDATED]
 > - AimBot
