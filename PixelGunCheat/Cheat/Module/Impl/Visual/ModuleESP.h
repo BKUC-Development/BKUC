@@ -18,8 +18,8 @@ static BKCCheckbox __esp_rainbow = BKCCheckbox("Rainbow :3", false);
 static BKCModule __esp = { "ESP", "I swear it's just a visual glitch in OBS!", VISUAL, 0x0, true, { &__esp_style, &__esp_thickness, &__esp_corner_rounding, &__esp_teammates, &__esp_tracers, &__esp_tracers_screen_pos, &__esp_rainbow, &__esp_rgb_speed } };
 
 static ImU32 color_enemy = ImGui::ColorConvertFloat4ToU32({ 1.00f, 0.00f, 0.00f, 1.00f });
-static ImU32 color_ally = ImGui::ColorConvertFloat4ToU32({ 0.00f, 0.00f, 1.00f, 1.00f });
-static ImU32 color_black = ImGui::ColorConvertFloat4ToU32({ 0.0f, 0.0f, 0.0f, 1.00f });
+static ImU32 color_ally  = ImGui::ColorConvertFloat4ToU32({ 0.00f, 0.00f, 1.00f, 1.00f });
+static ImU32 color_black = ImGui::ColorConvertFloat4ToU32({ 0.0f,  0.0f,  0.0f,  1.00f });
 
 static RECT window_size_esp;
 
@@ -35,23 +35,28 @@ struct EspPlayer {
 static std::list<EspPlayer> to_draw;
 static std::mutex to_draw_mutex;
 
-static bool is_on_screen_esp(const Unity::Vector3& pos) {
+static bool is_on_screen_esp(const Unity::Vector3& pos)
+{
     const int width = window_size_esp.right - window_size_esp.left;
     const int height = window_size_esp.bottom - window_size_esp.top;
     return pos.z > 0.01f && pos.x > -100 && pos.y > -100 && pos.x < static_cast<float>(width) + 100 && pos.y < static_cast<float>(height) + 100;
 }
 
-class ModuleESP : public ModuleBase {
+class ModuleESP : public ModuleBase
+{
 public:
     ModuleESP() : ModuleBase(&__esp) {}
 
-    void do_module(void* arg) override {
-        if ((ClientUtil::tick + 30) % 60 == 0) {
+    void do_module(void* arg) override
+    {
+        if ((ClientUtil::tick + 30) % 60 == 0)
+        {
             GetWindowRect(GetActiveWindow(), &window_size_esp);
         }
     }
 
-    static ImU32 get_rainbow_color(float time, float saturation, float value, float speed) {
+    static ImU32 get_rainbow_color(float time, float saturation, float value, float speed)
+    {
         float hue = std::fmod(time * speed, 1.0f);
         ImVec4 color_hsv(hue, saturation, value, 1.0f);
         ImVec4 color_rgb;
@@ -59,14 +64,19 @@ public:
         return ImGui::ColorConvertFloat4ToU32({ color_rgb.x, color_rgb.y, color_rgb.z, 1.0f });
     }
 
-    static void add_esp(void* player) {
-        if (!player || !Hooks::our_player || !Hooks::main_camera) {
+    static void add_esp(void* player)
+    {
+        if (!player || !Hooks::our_player || !Hooks::main_camera)
+        {
             return;
         }
 
-        try {
+        try
+        {
             Unity::CTransform* transform = static_cast<Unity::CTransform*>(Hooks::get_player_transform(player));
-            if (!transform) {
+            
+            if (!transform)
+            {
                 return;
             }
 
@@ -78,7 +88,8 @@ public:
             Functions::CameraWorldToScreen(Hooks::main_camera, &position, &screen_pos);
             Functions::CameraWorldToScreen(Hooks::main_camera, &top_world, &screen_top);
 
-            if (screen_pos.z < 0 || !is_on_screen_esp(screen_pos)) {
+            if (screen_pos.z < 0 || !is_on_screen_esp(screen_pos))
+            {
                 return;
             }
 
@@ -91,31 +102,39 @@ public:
             bool is_enemy = Hooks::is_player_enemy(player);
 
             std::lock_guard<std::mutex> lock(to_draw_mutex);
-            if (is_enemy) {
+            
+            if (is_enemy)
+            {
                 to_draw.push_back({ screen_pos, width2, height2, color_enemy, player_name, false });
             }
-            else if (__esp_teammates.enabled) {
+            else if (__esp_teammates.enabled)
+            {
                 to_draw.push_back({ screen_pos, width2, height2, color_ally, player_name, true });
             }
         }
-        catch (...) {
+        catch (...)
+        {
             to_draw.clear();
         }
     }
 
-    static void draw_esp(const Unity::Vector3& screen_pos, float width2, float height2, ImU32 color, const std::string& player_name, bool is_teammate) {
+    static void draw_esp(const Unity::Vector3& screen_pos, float width2, float height2, ImU32 color, const std::string& player_name, bool is_teammate)
+    {
         ImVec2 size = ImGui::CalcTextSize(player_name.c_str());
         ImU32 final_color = color;
 
-        if (__esp_rainbow.enabled && !is_teammate) {
+        if (__esp_rainbow.enabled && !is_teammate)
+        {
             final_color = get_rainbow_color(static_cast<float>(ImGui::GetTime()), 1.0f, 1.0f, __esp_rgb_speed.value);
         }
 
-        if (__esp_style.current_value == L"Simple") {
+        if (__esp_style.current_value == L"Simple")
+        {
             ImGui::GetBackgroundDrawList()->AddText({ screen_pos.x - size.x / 2, screen_pos.y - height2 }, final_color, player_name.c_str());
             ImGui::GetBackgroundDrawList()->AddRect({ screen_pos.x + width2, screen_pos.y + height2 }, { screen_pos.x - width2, screen_pos.y - height2 }, final_color, static_cast<float>(__esp_corner_rounding.value), 0, static_cast<float>(__esp_thickness.value));
         }
-        else if (__esp_style.current_value == L"CS-like") {
+        else if (__esp_style.current_value == L"CS-like")
+        {
             ImGui::GetBackgroundDrawList()->AddText({ screen_pos.x + 1 - size.x / 2, screen_pos.y + 1 - height2 }, color_black, player_name.c_str());
             ImGui::GetBackgroundDrawList()->AddText({ screen_pos.x + 1 - size.x / 2, screen_pos.y - 1 - height2 }, color_black, player_name.c_str());
             ImGui::GetBackgroundDrawList()->AddText({ screen_pos.x - 1 - size.x / 2, screen_pos.y + 1 - height2 }, color_black, player_name.c_str());
@@ -125,12 +144,16 @@ public:
             ImGui::GetBackgroundDrawList()->AddRect({ screen_pos.x + width2, screen_pos.y + height2 }, { screen_pos.x - width2, screen_pos.y - height2 }, final_color, static_cast<float>(__esp_corner_rounding.value), 0, static_cast<float>(__esp_thickness.value));
         }
 
-        if (__esp_tracers.enabled && !is_teammate) {
+        if (__esp_tracers.enabled && !is_teammate)
+        {
             ImVec2 bottom_center;
-            if (__esp_tracers_screen_pos.value < 0.501f) {
+            
+            if (__esp_tracers_screen_pos.value < 0.501f)
+            {
                 bottom_center = { screen_pos.x, screen_pos.y + height2 };
             }
-            else if (__esp_tracers_screen_pos.value > 0.499f) {
+            else if (__esp_tracers_screen_pos.value > 0.499f)
+            {
                 bottom_center = { screen_pos.x, screen_pos.y - height2 };
             }
 
@@ -138,10 +161,13 @@ public:
         }
     }
 
-    void draw_all() {
-        if (is_enabled()) {
+    void draw_all()
+    {
+        if (is_enabled())
+        {
             std::lock_guard<std::mutex> lock(to_draw_mutex);
-            for (const auto& draw : to_draw) {
+            for (const auto& draw : to_draw)
+            {
                 if (!Hooks::main_camera) return;
                 draw_esp(draw.screen_pos, draw.width2, draw.height2, draw.color, draw.player_name, draw.is_teammate);
             }

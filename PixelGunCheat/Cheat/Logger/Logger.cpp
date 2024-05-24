@@ -126,13 +126,13 @@ void Logger::log_debug(const std::string& msg)
     log_thread.join();
 }
 
-void Logger:: log_info(const std::string& msg)
+void Logger::log_info(const std::string& msg)
 {
     std::thread log_thread(info, msg);
     log_thread.join();
 }
 
-void Logger:: log_warn(const std::string& msg)
+void Logger::log_warn(const std::string& msg)
 {
     std::thread log_thread(warn, msg);
     log_thread.join();

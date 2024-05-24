@@ -36,7 +36,7 @@ WPARAM MapLeftRightKeys(const MSG& msg);
 
 // Boykisser Central Vars
 std::string BKCImGuiHooker::c_Title = "Boykisser Central";
-std::string BKCImGuiHooker::c_RealBuild = "v2.5.2";
+std::string BKCImGuiHooker::c_RealBuild = "v2.5.5";
 static std::string c_Build = ":3";
 std::stringstream full_title;
 std::string combo_file = "default";
@@ -256,8 +256,7 @@ void try_runtime_hook()
     Logger::log_debug(s2.str());
     last_rhd = (LPVOID*)(Hooks::GameAssembly + offset);
     int res;
-    if (!rhd_is_float)
-    {
+    if (!rhd_is_float) {
         res = MH_CreateHook(last_rhd, &rhd, (LPVOID*)&rhd_original);
     }
     else

@@ -418,7 +418,6 @@ inline void __stdcall player_move_c(void* arg)
     {
         // Other Players
         if (Hooks::main_camera == nullptr) return player_move_c_original(arg);
-        // Functions::TestKicker(arg);
         Hooks::fov_changer_module->run(nullptr);
         esp_module->add_esp(arg);
         working_player_list.push_back(arg);
