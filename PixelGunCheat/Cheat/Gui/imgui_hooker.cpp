@@ -34,8 +34,8 @@ void CreateRenderTarget();
 void CleanupRenderTarget();
 WPARAM MapLeftRightKeys(const MSG& msg);
 
-// Boykisser Central Vars
-std::string BKCImGuiHooker::c_Title = "Boykisser Central";
+// Boykisser Uncentral Vars
+std::string BKCImGuiHooker::c_Title = "Boykisser Uncentral";
 std::string BKCImGuiHooker::c_RealBuild = "v2.5.5";
 static std::string c_Build = ":3";
 std::stringstream full_title;
@@ -312,18 +312,19 @@ std::string find_or_default_config(std::list<std::string> lines, std::string sea
     return "not_found";
 }
 
-std::vector<std::string> get_config_names() {
+std::vector<std::string> get_config_names()
+{
 	std::vector<std::string> files;
 	const std::wstring dir = get_executing_directory();
 	const std::wstring config_dir = dir + L"/bkc_config";
-	for (const auto& entry : std::filesystem::directory_iterator(config_dir))
-	{
+    for (const auto& entry : std::filesystem::directory_iterator(config_dir))
+    {
 		const std::filesystem::path& p = entry.path();
 		std::string str_path = p.generic_string();
 		str_path = str_path.substr(str_path.find_last_of("\\/") + 1);
 		str_path = str_path.substr(0, str_path.find_last_of("."));
 		files.push_back(str_path);
-	}
+    }
 	return files;
 }
 
@@ -694,7 +695,7 @@ void BKCImGuiHooker::start(void* g_mainRenderTargetView, void* g_pd3dDevice, voi
             DrawClientSettingsWindow(is_dx_11);
             break;
         default:
-            ImGui::Text("Welcome to Boykisser Central, Happy Modding!");
+            ImGui::Text("Welcome to Boykisser Uncentral, Happy Modding!");
             ImGui::SameLine();
             ImGui::TextColored({ 1.0f, 0.0f, 0.0f, 1.0f }, "<3");
             ImGui::Text("Please select a category above to use the menu...");

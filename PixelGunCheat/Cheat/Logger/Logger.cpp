@@ -46,8 +46,8 @@ void Logger::log_client_name()
     fopen_s(&file, "bkc_latest_log.txt", "a+");
     std::ofstream out(file);
     SetConsoleTextAttribute(console, fg_l_purple);
-    std::cout << "[Boykisser Central]";
-    out << "[Boykisser Central]";
+    std::cout << "[Boykisser Uncentral]";
+    out << "[Boykisser Uncentral]";
 }
 
 void debug(const std::string& msg)

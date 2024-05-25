@@ -4,9 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <d3d11.h>
-#include <list>
 
-// Boykisser Central Module Vars
+// Boykisser Uncentral Module Vars
 class BKCSetting
 {
 public:
