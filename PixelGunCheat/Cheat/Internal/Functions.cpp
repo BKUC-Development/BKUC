@@ -1,11 +1,7 @@
 ﻿#include "Functions.h"
 
 #include <cstdint>
-#include <stdbool.h>
-#include <stdbool.h>
-#include <stdbool.h>
 
-#include "../Hooks/Hooks.h"
 #include "../Offsets/Offsets.h"
 
 static uintptr_t GameBase_;
@@ -252,13 +248,6 @@ void* Functions::CameraGetMain()
 {
     static const auto fn = (void*(*)())(GameAssembly_ + Offsets::CameraGetMain);
     return fn(); 
-}
-
-void Functions::TestKicker(void* arg)
-{
-    if (!arg) return;
-    static const auto fn = (void(*)(void*, void*, void*))(GameAssembly_ + 0x1b1e9f0);
-    return fn(arg, Hooks::create_system_string("kick_test"), nullptr);
 }
 
 void Functions::CameraSetFov(void* arg, float fov)

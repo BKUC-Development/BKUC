@@ -2,11 +2,11 @@
 
 #include <sstream>
 
-#include "../Internal/Functions.h"
 #include "../Logger/Logger.h"
+#include "../UI/UIHooks.h"
 
 uint64_t ClientUtil::tick = 0;
-uint64_t ClientUtil::fixed_tick_ingame = 0;
+uint64_t ClientUtil::fixed_tick = 0;
 RECT ClientUtil::win_size_info;
 float ClientUtil::color_prog_offset = 0;
 

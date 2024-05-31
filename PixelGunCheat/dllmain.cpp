@@ -8,15 +8,14 @@
 #include <windows.h>
 
 #include <dxgi.h>
-#include <d3d10_1.h>
 #include <d3d10.h>
 #include <d3d11.h>
 #include <filesystem>
 #include <imgui.h>
-#include <stdbool.h>
 
-#include "Cheat/Gui/imgui_hooker.h"
 #include "Cheat/Logger/Logger.h"
+#include "Cheat/UI/UIHooks.h"
+#include "Cheat/Util/ClientUtil.h"
 #include "kiero/kiero.h"
 
 HWND window = NULL;
@@ -82,15 +81,13 @@ bool isWindowVisible = false;
 void ShowMouseCursor(bool show) {
     if (show) {
         while (ShowCursor(TRUE) < 0);
-    }
-    else {
+    } else {
         while (ShowCursor(FALSE) >= 0);
     }
 }
 
 void HandleMouseInputs(HWND hWnd, ImGuiIO& io) {
-    if (!isWindowVisible)
-        return;
+    if (!isWindowVisible) return;
 
     POINT mousePos;
     GetCursorPos(&mousePos);
@@ -119,7 +116,7 @@ WPARAM MapLeftRightKeys(WPARAM wParam, LPARAM lParam)
         break;
     default:
         // not a key we map from generic to left/right specialized
-        //  just return it.
+        // just return it.
         new_vk = wParam;
         break;    
     }
@@ -150,45 +147,37 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
         HandleMouseInputs(hWnd, io);
         break;
     case WM_LBUTTONDOWN:
-        if (isWindowVisible)
-            io.MouseDown[0] = true;
+        if (isWindowVisible) io.MouseDown[0] = true;
         break;
     case WM_LBUTTONUP:
-        if (isWindowVisible)
-            io.MouseDown[0] = false;
+        if (isWindowVisible) io.MouseDown[0] = false;
         break;
     case WM_RBUTTONDOWN:
-        if (isWindowVisible)
-            io.MouseDown[1] = true;
+        if (isWindowVisible) io.MouseDown[1] = true;
         break;
     case WM_RBUTTONUP:
-        if (isWindowVisible)
-            io.MouseDown[1] = false;
+        if (isWindowVisible) io.MouseDown[1] = false;
         break;
     case WM_MBUTTONDOWN:
-        if (isWindowVisible)
-            io.MouseDown[2] = true;
+        if (isWindowVisible) io.MouseDown[2] = true;
         break;
     case WM_MBUTTONUP:
-        if (isWindowVisible)
-            io.MouseDown[2] = false;
+        if (isWindowVisible) io.MouseDown[2] = false;
         break;
     case WM_KEYDOWN:
-        if (MapLeftRightKeys(wParam, lParam) == VK_RSHIFT || isWindowVisible && BKCImGuiHooker::c_GuiEnabled && wParam == VK_ESCAPE) { // allow escape key usage when menu is open (i am too used to mc functionality smh)
+        if (MapLeftRightKeys(wParam, lParam) == VK_RSHIFT || isWindowVisible && ClientUtil::ui_hooks_render && wParam == VK_ESCAPE) { // allow escape key usage when menu is open (i am too used to mc functionality smh)
             ShowMouseCursor(!isWindowVisible);
             isWindowVisible = !isWindowVisible;
-            BKCImGuiHooker::c_GuiEnabled = !BKCImGuiHooker::c_GuiEnabled;
+            ClientUtil::ui_hooks_render = !ClientUtil::ui_hooks_render;
         }
         break;
     case WM_SIZE:
-        if (wParam == SIZE_MINIMIZED)
-            return 0;
+        if (wParam == SIZE_MINIMIZED) return 0;
         g_ResizeWidth = (UINT)LOWORD(lParam); // Queue resize
         g_ResizeHeight = (UINT)HIWORD(lParam);
         return 0;
-    case WM_SYSCOMMAND:
-        if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
-            return 0;
+    case WM_SYSCOMMAND: // Disable ALT application menu
+        if ((wParam & 0xfff0) == SC_KEYMENU) return 0;
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
@@ -228,7 +217,6 @@ void native_font_list(bool ttf_only)
 long (__stdcall* oPresent)(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 long __stdcall hkPresent11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) 
 {
-    // Do the Things
     static bool is_init = true;
     if (is_init)
     {
@@ -249,7 +237,7 @@ long __stdcall hkPresent11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
             Logger::log_info("Kiero D3D11 hkPresent hooked successfully!");
             // Init Imgui
 
-            BKCImGuiHooker::setup_imgui_hwnd(window, pDevice11, pContext11, dx11);
+            UIHooks::SetUpImGuiWindow(window, pDevice11, pContext11, dx11);
             
             is_init = false;
 
@@ -257,7 +245,7 @@ long __stdcall hkPresent11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
         }
     }
 
-    BKCImGuiHooker::start(mainRenderTargetView11, pDevice11, pContext11, dx11);
+    UIHooks::StartImGui(mainRenderTargetView11, pDevice11, pContext11, dx11);
     
     return oPresent(pSwapChain, SyncInterval, Flags);
 }
@@ -284,7 +272,7 @@ long __stdcall hkPresent10(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
             Logger::log_info("Kiero D3D10 hkPresent hooked successfully!");
             // Init Imgui
 
-            BKCImGuiHooker::setup_imgui_hwnd(window, pDevice10, nullptr, dx11);
+            UIHooks::SetUpImGuiWindow(window, pDevice10, nullptr, dx11);
             
             is_init = false;
 
@@ -292,12 +280,10 @@ long __stdcall hkPresent10(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
         }
     }
     
-    BKCImGuiHooker::start(mainRenderTargetView10, pDevice10, nullptr, dx11);
+    UIHooks::StartImGui(mainRenderTargetView10, pDevice10, nullptr, dx11);
     
     return oPresent(pSwapChain, SyncInterval, Flags);
 }
-
-#include "Cheat/Hooks/Hooks.h"
 
 HMODULE Dll;
 
@@ -336,7 +322,7 @@ int64_t WINAPI MainThread(LPVOID param)
     Logger::log_info("");
     Logger::log_info("You like kissing boys don't you~~ ;3");
     Logger::log_info("");
-    Logger::log_info("Currently using " + BKCImGuiHooker::c_Title + " " + BKCImGuiHooker::c_RealBuild);
+    Logger::log_info("Currently using " + ClientUtil::client_name + " " + ClientUtil::client_ver);
     Logger::log_info("Made with love (and several lost braincells) by @hiderikzki & @george2bush (@stanuwu)");
     Logger::log_info("");
     
@@ -368,6 +354,7 @@ int64_t WINAPI MainThread(LPVOID param)
     }
     
     Hooks* hooks = new Hooks();
+    
     try
     {
         // Instantiate and Load

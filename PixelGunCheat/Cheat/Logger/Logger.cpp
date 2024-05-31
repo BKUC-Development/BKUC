@@ -5,7 +5,6 @@
 
 #include <chrono>
 #include <fstream>
-#include <sstream>
 #include <thread>
 
 HANDLE Logger::console;
