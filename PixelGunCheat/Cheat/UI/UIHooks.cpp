@@ -422,7 +422,7 @@ void UIHooks::StartImGui(void* g_mainRenderTargetView, void* g_pd3dDevice, void*
         Logger::log_info("Loaded default config!");
     }
     
-    // TODO: Make this not suck
+    // NOTE: Make this not suck
     if (ClientUtil::has_font_changed)
     {
         ClientUtil::has_font_changed = false;

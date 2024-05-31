@@ -536,7 +536,7 @@ static inline std::vector<ArmorData> armor_names = {
 { 8, L"avatar_redskin" },
 { 8, L"avatar_rescuer" },
 { 8, L"avatar_revived" },
-// { 8, L"avatar_rgb_hero" }, TODO: ONLY WITH DEV METHOD
+// { 8, L"avatar_rgb_hero" }, NOTE: ONLY WITH DEV METHOD
 { 8, L"avatar_richman" },
 { 8, L"avatar_robb_e" },
 { 8, L"avatar_robo_elf" },
