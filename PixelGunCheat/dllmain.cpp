@@ -325,7 +325,7 @@ int64_t WINAPI MainThread(LPVOID param)
     AllocConsole();
     FILE* fp;
     freopen_s(&fp, "CONOUT$", "w", stdout);
-    SetConsoleTitleW(L"Boykisser Uncentral");
+    SetConsoleTitleW(L"boykisser.cc (BKUC)");
     const HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
     Logger::console = console;
     SetConsoleTextAttribute(console, 0x000F);

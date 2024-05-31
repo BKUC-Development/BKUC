@@ -35,8 +35,8 @@ void CleanupRenderTarget();
 WPARAM MapLeftRightKeys(const MSG& msg);
 
 // Boykisser Uncentral Vars
-std::string BKCImGuiHooker::c_Title = "Boykisser Uncentral";
-std::string BKCImGuiHooker::c_RealBuild = "v2.5.5";
+std::string BKCImGuiHooker::c_Title = "boykisser.cc";
+std::string BKCImGuiHooker::c_RealBuild = "v2.6";
 static std::string c_Build = ":3";
 std::stringstream full_title;
 std::string combo_file = "default";
@@ -695,7 +695,7 @@ void BKCImGuiHooker::start(void* g_mainRenderTargetView, void* g_pd3dDevice, voi
             DrawClientSettingsWindow(is_dx_11);
             break;
         default:
-            ImGui::Text("Welcome to Boykisser Uncentral, Happy Modding!");
+            ImGui::Text("Welcome to boykisser.cc (BKUC), Happy Modding!");
             ImGui::SameLine();
             ImGui::TextColored({ 1.0f, 0.0f, 0.0f, 1.0f }, "<3");
             ImGui::Text("Please select a category above to use the menu...");

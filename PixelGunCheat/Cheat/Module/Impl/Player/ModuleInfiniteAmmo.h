@@ -16,7 +16,7 @@ public:
         {
             set_bool(arg, 0x479, true); // isUnlimitedAmmo
         
-            void* item_record = get_element(arg, 0x6b8); // itemRecord
+            void* item_record = get_element(arg, 0x6c8); // itemRecord
             set_bool(item_record, 0x6c, true); // isUnlimitedAmmo
             set_int(item_record, 0x20, 9999); // ammoInClip
             set_int(item_record, 0xb0, 9999); // modulesClipAmmoModifier
