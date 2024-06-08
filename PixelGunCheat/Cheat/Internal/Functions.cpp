@@ -1,12 +1,10 @@
 ﻿#include "Functions.h"
 
 #include <cstdint>
-#include <stdbool.h>
-#include <stdbool.h>
-#include <stdbool.h>
+#include <string>
 
-#include "../Hooks/Hooks.h"
 #include "../Offsets/Offsets.h"
+#include "../Util/IL2CPPUtil.h"
 
 static uintptr_t GameBase_;
 static uintptr_t GameAssembly_;
@@ -206,7 +204,7 @@ void Functions::ActivateGadget(void* arg, int gadget_id, int level)
 {
     if (!arg) return;
     static const auto fn = (void(*)(void*, int, void*, int))(GameAssembly_ + Offsets::GadgetActivate);
-    return fn(arg, gadget_id, Hooks::create_system_string("IWouldNotLieThatThisIsARealStringForThisMethodCallBro"), level);
+    return fn(arg, gadget_id, (void*)0/*Hooks::create_system_string("IWouldNotLieThatThisIsARealStringForThisMethodCallBro")*/, level);
 }
 
 void Functions::DeactivateGadget(void* arg, int gadget_id)
@@ -233,7 +231,7 @@ void Functions::SendChat(void* arg, void* msg)
 {
     if (!arg) return;
     static const auto fn = (void(*)(void*, void*, bool, void*))(GameAssembly_ + Offsets::SendChat);
-    return fn(arg, msg, false, Hooks::create_system_string(""));
+    return fn(arg, msg, false, (void*)0/*Hooks::create_system_string("")*/);
 }
 
 
@@ -254,15 +252,23 @@ void* Functions::CameraGetMain()
     return fn(); 
 }
 
-void Functions::TestKicker(void* arg)
-{
-    if (!arg) return;
-    static const auto fn = (void(*)(void*, void*, void*))(GameAssembly_ + 0x1b1e9f0);
-    return fn(arg, Hooks::create_system_string("kick_test"), nullptr);
-}
-
 void Functions::CameraSetFov(void* arg, float fov)
 {
     static const auto fn = (void(*)(void*, float))(GameAssembly_ + Offsets::CameraSetFieldOfView);
     return fn(arg, fov); 
+}
+
+// Below methods give me a headache, i have no fucking idea if they work yet LMFAO
+
+IL2CPPUtil::System_String* Functions::ConstructString(std::string str)
+{
+    static const auto fn = (IL2CPPUtil::System_String*(*)(IL2CPPUtil::il2cppArray<char>*))(GameAssembly_ + 0x37e4210);
+    auto char_arr = IL2CPPUtil::il2cppArray<char>();
+    char_arr.Insert(str.data(), str.size());
+    return fn(&char_arr);
+}
+
+IL2CPPUtil::System_String* Functions::ConstructStringAdv(std::string str)
+{
+    return reinterpret_cast<IL2CPPUtil::System_String*(__fastcall*)(void*, const char*)>(create_string)(get_domain(), str.data());
 }

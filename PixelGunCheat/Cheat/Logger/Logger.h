@@ -1,9 +1,12 @@
 ﻿#pragma once
 
+#include <string>
+#include <Windows.h>
+
 class Logger
 {
 public:
-    static HANDLE console;
+    static HANDLE bkuc_console;
     static void log_client_name();
     static void log_info(const std::string& msg);
     static void log_warn(const std::string& msg);
