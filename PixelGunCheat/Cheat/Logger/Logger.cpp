@@ -1,13 +1,11 @@
-﻿#include <iostream>
-#include <windows.h>
-
-#include "Logger.h"
+﻿#include "Logger.h"
 
 #include <chrono>
 #include <fstream>
+#include <iostream>
 #include <thread>
 
-HANDLE Logger::console;
+HANDLE Logger::bkuc_console;
 
 // reds
 WORD fg_red   = 0x0004;
@@ -44,7 +42,7 @@ void Logger::log_client_name()
     thread_write_locked = true;
     fopen_s(&file, "bkc_latest_log.txt", "a+");
     std::ofstream out(file);
-    SetConsoleTextAttribute(console, fg_l_purple);
+    SetConsoleTextAttribute(bkuc_console, fg_l_purple);
     std::cout << "[boykisser.cc]";
     out << "[boykisser.cc]";
 }
@@ -53,10 +51,10 @@ void debug(const std::string& msg)
 {
     std::ofstream out(file);
     Logger::log_client_name();
-    SetConsoleTextAttribute(Logger::console, fg_gray);
+    SetConsoleTextAttribute(Logger::bkuc_console, fg_gray);
     std::cout << " [DEBUG] ";
     out << " [DEBUG] ";
-    SetConsoleTextAttribute(Logger::console, fg_white);
+    SetConsoleTextAttribute(Logger::bkuc_console, fg_white);
     std::cout << msg << std::endl;
     out << msg << std::endl;
     thread_write_locked = false;
@@ -67,10 +65,10 @@ void info(const std::string& msg)
 {
     std::ofstream out(file);
     Logger::log_client_name();
-    SetConsoleTextAttribute(Logger::console, fg_l_green);
+    SetConsoleTextAttribute(Logger::bkuc_console, fg_l_green);
     std::cout << " [INFO] ";
     out << " [INFO] ";
-    SetConsoleTextAttribute(Logger::console, fg_white);
+    SetConsoleTextAttribute(Logger::bkuc_console, fg_white);
     std::cout << msg << std::endl;
     out << msg << std::endl;
     thread_write_locked = false;
@@ -81,10 +79,10 @@ void warn(const std::string& msg)
 {
     std::ofstream out(file);
     Logger::log_client_name();
-    SetConsoleTextAttribute(Logger::console, fg_l_yellow);
+    SetConsoleTextAttribute(Logger::bkuc_console, fg_l_yellow);
     std::cout << " [WARN] ";
     out << " [WARN] ";
-    SetConsoleTextAttribute(Logger::console, fg_white);
+    SetConsoleTextAttribute(Logger::bkuc_console, fg_white);
     std::cout << msg << std::endl;
     out << msg << std::endl;
     thread_write_locked = false;
@@ -95,10 +93,10 @@ void err(const std::string& msg)
 {
     std::ofstream out(file);
     Logger::log_client_name();
-    SetConsoleTextAttribute(Logger::console, fg_l_red);
+    SetConsoleTextAttribute(Logger::bkuc_console, fg_l_red);
     std::cout << " [ERR] ";
     out << " [ERR] ";
-    SetConsoleTextAttribute(Logger::console, fg_white);
+    SetConsoleTextAttribute(Logger::bkuc_console, fg_white);
     std::cout << msg << std::endl;
     out << msg << std::endl;
     thread_write_locked = false;
@@ -109,10 +107,10 @@ void fatal(const std::string& msg)
 {
     std::ofstream out(file);
     Logger::log_client_name();
-    SetConsoleTextAttribute(Logger::console, fg_red);
+    SetConsoleTextAttribute(Logger::bkuc_console, fg_red);
     std::cout << " [FATAL] ";
     out << " [FATAL] ";
-    SetConsoleTextAttribute(Logger::console, fg_white);
+    SetConsoleTextAttribute(Logger::bkuc_console, fg_white);
     std::cout << msg << std::endl;
     out << msg << std::endl;
     thread_write_locked = false;

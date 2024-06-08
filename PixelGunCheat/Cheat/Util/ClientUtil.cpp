@@ -1,9 +1,12 @@
 ﻿#include "ClientUtil.h"
 
+#include <algorithm>
+#include <list>
 #include <sstream>
 
+#include "IL2CPPUtil.h"
+#include "../Internal/Functions.h"
 #include "../Logger/Logger.h"
-#include "../UI/UIHooks.h"
 
 uint64_t ClientUtil::tick = 0;
 uint64_t ClientUtil::fixed_tick = 0;
@@ -13,6 +16,18 @@ float ClientUtil::color_prog_offset = 0;
 void ClientUtil::UpdateWinSize()
 {
     GetWindowRect(GetActiveWindow(), &ClientUtil::win_size_info);
+}
+
+std::string ClientUtil::StrLow(std::string str)
+{
+    std::ranges::transform(str, str.begin(), [](const unsigned char c){ return std::tolower(c); });
+    return str;
+}
+
+std::wstring ClientUtil::WStrLow(std::wstring str)
+{
+    std::ranges::transform(str, str.begin(), [](const unsigned char c){ return std::tolower(c); });
+    return str;
 }
 
 std::string ClientUtil::CleanString(std::string string)
@@ -70,10 +85,10 @@ std::vector<float> ClientUtil::GetColor(uint32_t color)
 
 uint32_t ClientUtil::GetColorHex(const std::vector<float>& rgba)
 {
-    int r = (int) (rgba[0] * 255.0f) & 0xFF;
-    int g = (int) (rgba[1] * 255.0f) & 0xFF;
-    int b = (int) (rgba[2] * 255.0f) & 0xFF;
-    int a = (int) (rgba[3] * 255.0f) & 0xFF;
+    int r = (int)(rgba[0] * 255.0f) & 0xFF;
+    int g = (int)(rgba[1] * 255.0f) & 0xFF;
+    int b = (int)(rgba[2] * 255.0f) & 0xFF;
+    int a = (int)(rgba[3] * 255.0f) & 0xFF;
     return (a << 24) + (r << 16) + (g << 8) + b;
 }
 
@@ -106,11 +121,11 @@ uint32_t ClientUtil::Blend2Color(const uint32_t start, const uint32_t end, const
     }));
 }
 
-uint32_t ClientUtil::BlendDynamic(float progress, const std::vector<uint32_t>& colors)
+uint32_t ClientUtil::BlendDynamic(float progress, const std::vector<uint32_t>& colors, const bool normalize)
 {
     if (colors.empty()) return 0xFFFFFFFF; 
     if (colors.size() == 1) return colors[0];
-    progress *= 2.0f / ((float)colors.size() - (float)(colors[0] == colors[colors.size() - 1] ? 1 : 0)); // assume that we are using an inverted list after the last actual color
+    if (normalize) progress *= 2.0f / ((float)colors.size() - (float)(colors[0] == colors[colors.size() - 1] ? 1 : 0)); // assume that we are using an inverted list after the last actual color
     progress = BlendProgressWrap(progress);
     if (progress == 0.0f) { return colors[0]; }
     if (progress == 1.0f) { return colors[colors.size() - 1]; }
@@ -129,4 +144,17 @@ ImU32 ClientUtil::QuickDynamicBlendImU32(float progress, const std::vector<uint3
 float ClientUtil::GetFrameTime()
 {
     return 1 / ImGui::GetIO().Framerate;
+}
+
+void* ClientUtil::CreateCSString(std::string string)
+{
+    IL2CPPUtil::System_String* ns = Functions::ConstructString(string);
+    return ns;
+}
+
+void* ClientUtil::CreateCSStringW(std::wstring string)
+{
+    std::string s(string.begin(), string.end());
+    IL2CPPUtil::System_String* ns = Functions::ConstructString(s);
+    return ns;
 }

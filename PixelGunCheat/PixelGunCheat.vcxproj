@@ -164,6 +164,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Cheat\Core\Hooks\Detour.cpp" />
+    <ClCompile Include="Cheat\Core\Hooks\Detours\DetourUnityLogger.cpp" />
+    <ClCompile Include="Cheat\Core\MethodHooks.cpp" />
+    <ClCompile Include="Cheat\Core\UnityGame.cpp" />
     <ClCompile Include="Cheat\Internal\Functions.cpp" />
     <ClCompile Include="Cheat\Logger\Logger.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
@@ -241,13 +245,17 @@
       <LinkCompiled>true</LinkCompiled>
       <AdditionalIncludeDirectories>;C:\Users\Hideri\Documents\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="Cheat\Module\BKUCModule.cpp" />
     <ClCompile Include="Cheat\UI\UIHooks.cpp" />
     <ClCompile Include="Cheat\Util\ClientUtil.cpp" />
+    <ClCompile Include="Cheat\Util\IL2CPPUtil.cpp" />
     <ClCompile Include="kiero\kiero.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Cheat\Core\Hooks\Detour.h" />
+    <ClInclude Include="Cheat\Core\Hooks\Detours\DetourUnityLogger.h" />
+    <ClInclude Include="Cheat\Core\MethodHooks.h" />
+    <ClInclude Include="Cheat\Core\UnityGame.h" />
     <ClInclude Include="Cheat\Data\Armor.h" />
     <ClInclude Include="Cheat\Data\Currency.h" />
     <ClInclude Include="Cheat\Data\Gadgets.h" />
@@ -262,10 +270,10 @@
     <ClInclude Include="Cheat\Offsets\Offsets.h" />
     <ClInclude Include="Cheat\UI\UIHooks.h" />
     <ClInclude Include="Cheat\Util\ClientUtil.h" />
+    <ClInclude Include="Cheat\Util\IL2CPPUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cheat\Module\Impl\" />
-    <Folder Include="Cheat\Module\Settings\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

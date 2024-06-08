@@ -10,6 +10,7 @@
 #include <thread>
 
 #include "../Logger/Logger.h"
+#include "../Module/BKUCModule.h"
 #include "../Util/ClientUtil.h"
 
 ImVec4 ImVec4i(const int r, const int g, const int b, const int a = 255)
@@ -114,7 +115,7 @@ void GetDesktopResolution(int& horizontal, int& vertical)
     vertical = desktop.bottom;
 }
 
-HWND imgui_handle;
+void* imgui_handle;
 float scale_factor;
 
 static ImU32 color_title = ImGui::ColorConvertFloat4ToU32(ImVec4i(255, 180, 230));
@@ -124,7 +125,24 @@ ImFont* gui_font;
 ImFont* watermark_font;
 ImFont* arraylist_font;
 
-void UIHooks::SetUpImGuiWindow(HWND handle, void* device, void* device_context, bool is_dx_11)
+void UIHooks::UnloadImGui(bool is_dx_11)
+{
+    if (is_dx_11)
+    {
+        ImGui_ImplDX11_InvalidateDeviceObjects();
+        ImGui_ImplDX11_Shutdown();
+    }
+    else
+    {
+        ImGui_ImplDX10_InvalidateDeviceObjects();
+        ImGui_ImplDX10_Shutdown();
+    }
+    
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+}
+
+void UIHooks::SetUpImGuiWindow(void* handle, void* device, void* device_context, bool is_dx_11)
 {
     Logger::log_info("Setting up ImGui...");
     imgui_handle = handle;
@@ -172,6 +190,7 @@ void UIHooks::SetUpImGuiWindow(HWND handle, void* device, void* device_context, 
 
 void DrawClientSettingsWindow(bool is_dx_11)
 {
+    /*
     if (ImGui::BeginCombo("Font", current_font.c_str()))
     {
         for (std::string::size_type i = 0; i < fonts.size(); i++)
@@ -182,10 +201,11 @@ void DrawClientSettingsWindow(bool is_dx_11)
             {
                 current_font = fonts[i];
                 ImGuiIO& io = ImGui::GetIO(); (void) io;
-                BKCImGuiHooker::gui_font = io.Fonts->AddFontFromFileTTF(current_font.c_str(), 20.0f * BKCImGuiHooker::scale_factor);
-                BKCImGuiHooker::watermark_font = io.Fonts->AddFontFromFileTTF(current_font.c_str(), 32.0f * BKCImGuiHooker::scale_factor);
-                BKCImGuiHooker::arraylist_font = io.Fonts->AddFontFromFileTTF(current_font.c_str(), 24.0f * BKCImGuiHooker::scale_factor);
+                gui_font = io.Fonts->AddFontFromFileTTF(current_font.c_str(), 20.0f * scale_factor);
+                watermark_font = io.Fonts->AddFontFromFileTTF(current_font.c_str(), 32.0f * scale_factor);
+                arraylist_font = io.Fonts->AddFontFromFileTTF(current_font.c_str(), 24.0f * scale_factor);
                 io.Fonts->Build();
+                
                 // force invalidation and new frames
                 if (is_dx_11)
                 {
@@ -197,6 +217,7 @@ void DrawClientSettingsWindow(bool is_dx_11)
                     ImGui_ImplDX10_InvalidateDeviceObjects();
                     ImGui_ImplDX10_NewFrame();
                 }
+                
                 ImGui_ImplWin32_NewFrame();
                 ImGui::NewFrame();
                 Logger::log_info("Changed client font to " + current_font);
@@ -207,8 +228,10 @@ void DrawClientSettingsWindow(bool is_dx_11)
 
         ImGui::EndCombo();
     }
+    */
 
-    ImGui::Checkbox("Boundless Sliders", &boundless_value_setting);
+    bool test = false;
+    ImGui::Checkbox("Boundless Sliders", &test);
 
     if (ImGui::IsItemHovered())
     {
@@ -217,6 +240,7 @@ void DrawClientSettingsWindow(bool is_dx_11)
         
     if (ImGui::CollapsingHeader("Runtime Hooks (Dev)"))
     {
+        /*
         ImGui::Indent();
             
         ImGui::InputText("Offset##rhd", offsets_rhd, sizeof(offsets_rhd));
@@ -228,29 +252,33 @@ void DrawClientSettingsWindow(bool is_dx_11)
         }
             
         ImGui::Unindent();
+        */
     }
 
     if (ImGui::Button("Dump Item Records (Dev)"))
     {
-        Hooks::dump_item_records();
+        // Hooks::dump_item_records();
     }
 
     ImGui::SameLine();
     
     if (ImGui::Button("Dump All Records (Dev)"))
     {
-        Hooks::dump_all_records();
+        // Hooks::dump_all_records();
     }
 
     if (ImGui::Button("Send Test Notification"))
     {
+        /*
         ModuleNotifications::add_notification("Force Rejoin", "Detected a disconnection, trying to force rejoin... " + std::to_string(count), 3000);
         count++;
+        */
     }
 }
 
 void DrawConfigsWindow(bool is_dx_11)
 {
+    /*
     ImGui::InputText("##config_text", input_file, sizeof(input_file));
     ImGui::SameLine();
     
@@ -289,17 +317,17 @@ void DrawConfigsWindow(bool is_dx_11)
     {
         save_config(combo_file.c_str());
     }
+    */
 } 
 
-std::string strlow(std::string str)
+std::string unwiden_string(std::wstring wide)
 {
-    std::ranges::transform(str, str.begin(), [](const unsigned char c){ return std::tolower(c); });
-    return str;
+    return std::string(wide.begin(), wide.end());
 }
 
-void HandleModuleSettingRendering(BKCModule& module)
+void HandleModuleSettingRendering(BKUCModule& module)
 {
-    std::string last_separator = "";
+    std::string last_separator;
     
     for (auto& setting : module.settings)
     {
@@ -308,52 +336,54 @@ void HandleModuleSettingRendering(BKCModule& module)
             ImGui::SeparatorText(("Settings: " + setting->category).c_str());
             last_separator = setting->category;
         }
+
+        if (!BKUCModuleUtil::are_parents_enabled(setting)) continue;
         
         std::stringstream per_module_name;
         
         if (setting->type == 1)
         {
-            auto* checkbox = (BKCCheckbox*)setting;
+            auto* checkbox = (BKUCCheckbox*)setting;
             per_module_name << setting->name << "##" << module.name << setting->type;
-            ImGui::Checkbox(per_module_name.str().c_str(), &checkbox->enabled);
+            ImGui::Checkbox(per_module_name.str().c_str(), &checkbox->checked);
         }
         else if (setting->type == 2)
         {
-            auto* slider = (BKCSlider*)setting;
+            auto* slider = (BKUCSlider*)setting;
             per_module_name << setting->name << "##" << module.name << setting->type;
-            ImGui::SliderFloat(per_module_name.str().c_str(), &slider->value, slider->minimum, slider->maximum);
-            if (!boundless_value_setting) slider->value = std::ranges::clamp(slider->value, slider->minimum, slider->maximum);
+            ImGui::SliderFloat(per_module_name.str().c_str(), &slider->current, slider->min, slider->max);
+            if (true) slider->current = std::ranges::clamp(slider->current, slider->min, slider->max);
         }
         else if (setting->type == 3)
         {
-            auto* slider = (BKCSliderInt*)setting;
+            auto* slider = (BKUCSliderInt*)setting;
             per_module_name << setting->name << "##" << module.name << setting->type;
-            ImGui::SliderInt(per_module_name.str().c_str(), &slider->value, slider->minimum, slider->maximum);
-            if (!boundless_value_setting) slider->value = std::ranges::clamp(slider->value, slider->minimum, slider->maximum);
+            ImGui::SliderInt(per_module_name.str().c_str(), &slider->current, slider->min, slider->max);
+            if (true) slider->current = std::ranges::clamp(slider->current, slider->min, slider->max);
         }
         else if (setting->type == 4)
         {
             std::stringstream search;
-            auto* dropdown = (BKCDropdown*)setting;
+            auto* dropdown = (BKUCDropdown*)setting;
             search << "Search..." << "##" << setting->name << module.name << setting->type;
             per_module_name << setting->name << "##" << module.name << setting->type;
-            if (ImGui::BeginCombo(per_module_name.str().c_str(), w_to_string_(dropdown->current_value).c_str()))
+            if (ImGui::BeginCombo(per_module_name.str().c_str(), unwiden_string(dropdown->current).c_str()))
             {
-                if (dropdown->search)
+                if (dropdown->allow_search)
                 {
-                    ImGui::InputText(search.str().c_str(), dropdown->search_str, sizeof(dropdown->search_str));
+                    ImGui::InputText(search.str().c_str(), dropdown->search_string, sizeof(dropdown->search_string));
                 }
                 
                 for (std::string::size_type i = 0; i < dropdown->values.size(); i++)
                 {
-                    if (!dropdown->search || strlow(w_to_string_(dropdown->values[i])).find(strlow(dropdown->search_str)) != std::string::npos)
+                    if (!dropdown->allow_search || ClientUtil::StrLow(unwiden_string(dropdown->values[i])).find(ClientUtil::StrLow(dropdown->search_string)) != std::string::npos)
                     {
-                        const bool selected = dropdown->current_value == dropdown->values[i];
+                        const bool selected = dropdown->current == dropdown->values[i];
                     
-                        if (ImGui::Selectable(w_to_string_(dropdown->values[i]).c_str(), selected))
+                        if (ImGui::Selectable(unwiden_string(dropdown->values[i]).c_str(), selected))
                         {
-                            dropdown->current_value = dropdown->values[i];
-                            dropdown->current_index = dropdown->indexof(dropdown->current_value);
+                            dropdown->current = dropdown->values[i];
+                            dropdown->current_index = dropdown->indexof(dropdown->current);
                         }
                         if (selected) ImGui::SetItemDefaultFocus();
                     }
@@ -363,17 +393,17 @@ void HandleModuleSettingRendering(BKCModule& module)
             }
         }
 
-        if (!setting->tooltip.empty())
+        if (!setting->description.empty())
         {
             if (ImGui::IsItemHovered())
             {
-                ImGui::SetTooltip(setting->tooltip.c_str());
+                ImGui::SetTooltip(setting->description.c_str());
             }
         }
     }
 }
 
-void HandleModuleRendering(BKCModule& module)
+void HandleModuleRendering(BKUCModule& module)
 {
     const bool collapsing = ImGui::CollapsingHeader(module.name.c_str());
     if (ImGui::IsItemHovered()) ImGui::SetTooltip(module.description.c_str());
@@ -390,9 +420,9 @@ void HandleModuleRendering(BKCModule& module)
 }
 
 
-void HandleCategoryRendering(const std::string& name, const BKCCategory cat)
+void HandleCategoryRendering(const std::string& name, const UIHooksCategory cat)
 {
-    for (auto& module : BKCImGuiHooker::modules)
+    for (const auto& module : BKUCModule::modules)
     {
         if (module->category != cat) continue;
         HandleModuleRendering(*module);
@@ -410,9 +440,10 @@ void UIHooks::StartImGui(void* g_mainRenderTargetView, void* g_pd3dDevice, void*
 {
     while (gui_font == nullptr || watermark_font == nullptr || arraylist_font == nullptr)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
-    
+
+    /*
     // Load Config
     if (modules_loaded && !config_loaded)
     {
@@ -421,6 +452,7 @@ void UIHooks::StartImGui(void* g_mainRenderTargetView, void* g_pd3dDevice, void*
         save_config("default");
         Logger::log_info("Loaded default config!");
     }
+    */
     
     // NOTE: Make this not suck
     if (ClientUtil::has_font_changed)
@@ -543,27 +575,27 @@ void UIHooks::StartImGui(void* g_mainRenderTargetView, void* g_pd3dDevice, void*
         */
     }
 
+    /*
     // Modules
     Hooks::draw_all();
+    */
     
-    for (auto module : Hooks::on_imgui_draw_modules)
+    for (const auto module : BKUCModuleUtil::get_modules_of_type(GUI_2D_RENDER))
     {
         module->run(nullptr);
-    }
-
-    ImGui::PopFont();
+    } 
+    
+    ImGui::PopFont(); 
 
     // Watermark
     ImGui::PushFont(watermark_font);
-    
     const float size = ImGui::GetFontSize();
     ImGui::GetBackgroundDrawList()->AddText(nullptr, size, { 9,  4 }, ImGui::ColorConvertFloat4ToU32({ 0.0f, 0.0f, 0.0f, 0.5f }), ClientUtil::client_name.c_str());
     ImGui::GetBackgroundDrawList()->AddText(nullptr, size, { 9,  6 }, ImGui::ColorConvertFloat4ToU32({ 0.0f, 0.0f, 0.0f, 0.5f }), ClientUtil::client_name.c_str());
     ImGui::GetBackgroundDrawList()->AddText(nullptr, size, { 11, 4 }, ImGui::ColorConvertFloat4ToU32({ 0.0f, 0.0f, 0.0f, 0.5f }), ClientUtil::client_name.c_str());
     ImGui::GetBackgroundDrawList()->AddText(nullptr, size, { 11, 6 }, ImGui::ColorConvertFloat4ToU32({ 0.0f, 0.0f, 0.0f, 0.5f }), ClientUtil::client_name.c_str());
-    if (GlobalModuleDeclarations::hud_customizer_module != nullptr && ((ModuleBase*)GlobalModuleDeclarations::hud_customizer_module)->is_enabled()) ImGui::GetBackgroundDrawList()->AddText(nullptr, size, {10, 5}, GlobalModuleDeclarations::hud_customizer_module->get_color_scheme(ClientUtil::color_prog_offset), ClientUtil::client_name.c_str());
-    else ImGui::GetBackgroundDrawList()->AddText(nullptr, size, { 10, 5 }, color_title, ClientUtil::client_name.c_str());
-    
+    // if (GlobalModuleDeclarations::hud_customizer_module != nullptr && ((ModuleBase*)GlobalModuleDeclarations::hud_customizer_module)->is_enabled()) ImGui::GetBackgroundDrawList()->AddText(nullptr, size, {10, 5}, GlobalModuleDeclarations::hud_customizer_module->get_color_scheme(ClientUtil::color_prog_offset), ClientUtil::client_name.c_str());
+    ImGui::GetBackgroundDrawList()->AddText(nullptr, size, { 10, 5 }, color_title, ClientUtil::client_name.c_str());
     ImGui::PopFont();
     
     ImGui::Render();

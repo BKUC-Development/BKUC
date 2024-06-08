@@ -8,11 +8,14 @@
 #include <windows.h>
 
 #include <dxgi.h>
+#include <d3d10_1.h>
 #include <d3d10.h>
 #include <d3d11.h>
 #include <filesystem>
+#include <IL2CPP_Resolver.hpp>
 #include <imgui.h>
 
+#include "Cheat/Core/MethodHooks.h"
 #include "Cheat/Logger/Logger.h"
 #include "Cheat/UI/UIHooks.h"
 #include "Cheat/Util/ClientUtil.h"
@@ -313,11 +316,13 @@ int64_t WINAPI MainThread(LPVOID param)
     freopen_s(&fp, "CONOUT$", "w", stdout);
     SetConsoleTitleW(L"boykisser.cc (BKUC)");
     const HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-    Logger::console = console;
+    Logger::bkuc_console = console;
     SetConsoleTextAttribute(console, 0x000F);
     // ShowWindow(GetConsoleWindow(), SW_MINIMIZE);
 
     for (const auto& line : watermark) Logger::log_info(line);
+
+    IL2CPP::Initialize();
     
     Logger::log_info("");
     Logger::log_info("You like kissing boys don't you~~ ;3");
@@ -353,19 +358,7 @@ int64_t WINAPI MainThread(LPVOID param)
         }
     }
     
-    Hooks* hooks = new Hooks();
-    
-    try
-    {
-        // Instantiate and Load
-        hooks->load();
-    }
-    catch (int exception)
-    {
-        std::stringstream ex;
-        ex << "Exception: " << exception;
-        Logger::log_err(ex.str());
-    }
+    MethodHooks::InitDetours();
 
     Logger::log_info("Injected successfully!");
     Logger::log_info("(Insert to Eject)");
@@ -383,8 +376,8 @@ int64_t WINAPI MainThread(LPVOID param)
     // Unload
     kiero::unbind(8);
     kiero::shutdown();
-    hooks->unload();
-    BKCImGuiHooker::unload(dx11);
+    MethodHooks::UnloadDetours();
+    UIHooks::UnloadImGui(dx11);
     SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)oWndProc);
 
     shutdown(fp, "Shut Down");

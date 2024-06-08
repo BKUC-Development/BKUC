@@ -1,8 +1,11 @@
 ﻿#pragma once
 
 #include <cstdint>
+#include <imgui.h>
 
-#include "../Hooks/Hooks.h"
+#include <Windows.h>
+
+#include "../Util/IL2CPPUtil.h"
 
 struct Ray
 {
@@ -98,5 +101,6 @@ public:
     static ImVec4 ImVec4i(int r, int g, int b, int a = 255);
     static void* CameraGetMain();
     static void CameraSetFov(void* arg, float fov);
-    static void TestKicker(void* arg);
+    static IL2CPPUtil::System_String* ConstructString(std::string str);
+    static IL2CPPUtil::System_String* ConstructStringAdv(std::string str);
 };

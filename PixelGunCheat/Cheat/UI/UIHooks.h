@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <IL2CPP_Resolver.hpp>
 
 enum UIHooksCategory
 {
@@ -15,6 +14,7 @@ enum UIHooksCategory
 class UIHooks
 {
 public:
-    static void SetUpImGuiWindow(HWND handle, void* device, void* device_context, bool is_dx_11);
+    static void UnloadImGui(bool is_dx_11);
+    static void SetUpImGuiWindow(void* handle, void* device, void* device_context, bool is_dx_11);
     static void StartImGui(void* g_mainRenderTargetView, void* g_pd3dDevice, void* g_pd3dDeviceContext, bool is_dx_11);
 };
