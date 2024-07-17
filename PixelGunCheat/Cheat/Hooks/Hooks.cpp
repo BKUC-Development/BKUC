@@ -295,6 +295,7 @@ bool is_my_player_move_c(void* player_move_c)
 
 bool is_my_player_weapon_sounds(void* weapon_sounds)
 {
+    return false;
     void* player_move_c = (void*)*(uint64_t*)((uint64_t)weapon_sounds + Offsets::weaponSoundsPlayerMoveC);
     if (player_move_c == nullptr) return false;
     return is_my_player_move_c(player_move_c);
@@ -396,15 +397,11 @@ std::string random_string( size_t length )
 inline void(__stdcall* player_move_c_original)(void* arg);
 inline void __stdcall player_move_c(void* arg)
 {
-    bool my_player = is_my_player_move_c(arg);
-
-    if (my_player)
+    if (is_my_player_move_c(arg))
     {
-        // Just do this every fucking call innit
         Hooks::main_camera = find_main_camera();
         if (Hooks::main_camera == nullptr) return player_move_c_original(arg);
         Hooks::our_player = arg; // WARN: ALWAYS ALLOW THIS TO BE SET, OTHERWISE BREAKS A LOT OF MODULES
-        
         Hooks::fov_changer_module->run(nullptr);
 
         // Functions::SendChat(arg, Hooks::create_system_string(".gg/security-research [ " + random_string(8) + " ] "));
@@ -419,10 +416,10 @@ inline void __stdcall player_move_c(void* arg)
         // Other Players
         if (Hooks::main_camera == nullptr) return player_move_c_original(arg);
         Hooks::fov_changer_module->run(nullptr);
-        esp_module->add_esp(arg);
+        // ModuleESP::add_esp(arg);
         working_player_list.push_back(arg);
         
-        for (auto player_move_c_others_module : player_move_c_others_modules)
+        for (ModuleBase* player_move_c_others_module : player_move_c_others_modules)
         {
             player_move_c_others_module->run(arg);
         }
@@ -1054,15 +1051,15 @@ void Hooks::load()
 
     // Hook Functions Here
     hook_function(Offsets::PlayerMoveCUpdate, &player_move_c, &player_move_c_original);
+    hook_function(Offsets::PlayerMoveCFixedUpdate, &player_move_c_fixed, &player_move_c_fixed_original);
     hook_function(Offsets::WeaponSoundsUpdate, &weapon_sounds_call, &weapon_sounds_original);
     hook_function(Offsets::WeaponSoundsLateUpdate, &weapon_sounds_late_call, &weapon_sounds_late_original);
+    hook_function(Offsets::OnPreRender, &on_pre_render, &on_pre_render_original);
+    hook_function(Offsets::OnSceneUnload, &on_scene_unload, &on_scene_unload_original);
     hook_function(Offsets::InfiniteGemClaim, &infinite_gem_claim, &infinite_gem_claim_original);
     hook_function(Offsets::RapidFire, &rapid_fire, &rapid_fire_original);
     hook_function(Offsets::GetPlayerSpeed, &speed, &speed_original);
-    hook_function(Offsets::OnPreRender, &on_pre_render, &on_pre_render_original);
-    hook_function(Offsets::OnSceneUnload, &on_scene_unload, &on_scene_unload_original);
     hook_function(Offsets::PriceModifier, &free_lottery, &free_lottery_original);
-    hook_function(Offsets::PlayerMoveCFixedUpdate, &player_move_c_fixed, &player_move_c_fixed_original);
     hook_function(Offsets::RewardMultiplier, &reward_multiplier, &reward_multiplier_original);
     hook_function(Offsets::DoubleRewards, &double_rewards, &double_rewards_original);
     hook_function(Offsets::PremiumPass, &season_pass_premium, &season_pass_premium_original);
@@ -1097,17 +1094,17 @@ void Hooks::load()
     hook_function(Offsets::ProtonOnDisconnect2, &proton_connect_failure2, &proton_connect_failure_orig2);
     
     // LOG HOOKS
-    hook_function(0x43667e0, &debug_log, &debug_log_orig); // Log 1arg
-    hook_function(0x4366710, &debug_log_fmt, &debug_log_fmt_orig); // Log 2arg
-    hook_function(0x4366300, &debug_log_fmt2, &debug_log_fmt_orig2); // LogFormat 2arg
+    hook_function(0x4366ab0, &debug_log, &debug_log_orig); // Log 1arg
+    hook_function(0x43669e0, &debug_log_fmt, &debug_log_fmt_orig); // Log 2arg
+    hook_function(0x43665d0, &debug_log_fmt2, &debug_log_fmt_orig2); // LogFormat 2arg
         
-    hook_function(0x4366650, &debug_log_warn, &debug_log_warn_orig); // LogWarning 1arg
-    hook_function(0x4366580, &debug_log_warn_fmt, &debug_log_warn_fmt_orig); // LogWarning 2arg
-    hook_function(0x43663d0, &debug_log_warn_fmt2, &debug_log_warn_fmt_orig2); // LogWarningFormat 2arg
+    hook_function(0x4366920, &debug_log_warn, &debug_log_warn_orig); // LogWarning 1arg
+    hook_function(0x4366850, &debug_log_warn_fmt, &debug_log_warn_fmt_orig); // LogWarning 2arg
+    hook_function(0x43666a0, &debug_log_warn_fmt2, &debug_log_warn_fmt_orig2); // LogWarningFormat 2arg
         
-    hook_function(0x43660c0, &debug_log_error, &debug_log_error_orig); // LogError 1arg
-    hook_function(0x4365ff0, &debug_log_error_fmt, &debug_log_error_fmt_orig); // LogError 2arg
-    hook_function(0x4365f20, &debug_log_error_fmt2, &debug_log_error_fmt_orig2); // LogErrorFormat 2arg
+    hook_function(0x4366390, &debug_log_error, &debug_log_error_orig); // LogError 1arg
+    hook_function(0x43662c0, &debug_log_error_fmt, &debug_log_error_fmt_orig); // LogError 2arg
+    hook_function(0x43661f0, &debug_log_error_fmt2, &debug_log_error_fmt_orig2); // LogErrorFormat 2arg
 }
 
 void Hooks::unload()

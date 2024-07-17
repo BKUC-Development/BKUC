@@ -1,9 +1,6 @@
 ﻿#include "Functions.h"
 
 #include <cstdint>
-#include <stdbool.h>
-#include <stdbool.h>
-#include <stdbool.h>
 
 #include "../Hooks/Hooks.h"
 #include "../Offsets/Offsets.h"

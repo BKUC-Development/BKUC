@@ -16,6 +16,6 @@ public:
     {
         if (Hooks::main_camera == nullptr) return;
         // ((Unity::CCamera*)Hooks::main_camera)->SetFieldOfView(__fov_changer_fov.value);
-        Functions::CameraSetFov(Hooks::main_camera, __fov_changer_fov.value);
+        // Functions::CameraSetFov(Hooks::main_camera, __fov_changer_fov.value);
     }
 };

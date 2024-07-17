@@ -163,10 +163,10 @@ public:
     static inline uint64_t dashMaxImpulse = 0x29c;
     static inline uint64_t dashDecaySpeed = 0x2a0;
     static inline uint64_t dashDeltaImpact = 0x2a4;
-    static inline uint64_t playerMoveCPlayerDamageable = 0x660;
+    static inline uint64_t playerMoveCPlayerDamageable = 0x668;
     static inline uint64_t nickLabel = 0x3d0;
     static inline uint64_t weaponSoundsPlayerMoveC = 0x4f0; // private Player_move_c, not a private WeaponSounds !
-    static inline uint64_t myPlayerTransform = 0x3b0;
+    static inline uint64_t myPlayerTransform = 0x3b8;
     static inline uint64_t headCollider = 0x128;
     static inline uint64_t maxKoofZoom = 0x100;
     static inline uint64_t upKoofFireZoom = 0x104;

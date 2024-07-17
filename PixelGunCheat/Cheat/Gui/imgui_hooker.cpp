@@ -714,7 +714,7 @@ void BKCImGuiHooker::start(void* g_mainRenderTargetView, void* g_pd3dDevice, voi
     }
 
     // Modules
-    Hooks::draw_all();
+    // Hooks::draw_all();
     
     for (auto module : Hooks::on_imgui_draw_modules)
     {
