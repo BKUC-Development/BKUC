@@ -36,7 +36,7 @@ WPARAM MapLeftRightKeys(const MSG& msg);
 
 // Boykisser Uncentral Vars
 std::string BKCImGuiHooker::c_Title = "boykisser.cc";
-std::string BKCImGuiHooker::c_RealBuild = "v2.6";
+std::string BKCImGuiHooker::c_RealBuild = "v2.7-legacy";
 static std::string c_Build = ":3";
 std::stringstream full_title;
 std::string combo_file = "default";
