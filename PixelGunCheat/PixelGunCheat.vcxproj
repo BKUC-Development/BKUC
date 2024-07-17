@@ -165,7 +165,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Cheat\Core\Hooks\Detour.cpp" />
-    <ClCompile Include="Cheat\Core\Hooks\Detours\DetourUnityLogger.cpp" />
     <ClCompile Include="Cheat\Core\MethodHooks.cpp" />
     <ClCompile Include="Cheat\Core\UnityGame.cpp" />
     <ClCompile Include="Cheat\Internal\Functions.cpp" />
@@ -245,14 +244,19 @@
       <LinkCompiled>true</LinkCompiled>
       <AdditionalIncludeDirectories>;C:\Users\Hideri\Documents\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="Cheat\Module\BKUCModuleContainer.cpp" />
     <ClCompile Include="Cheat\UI\UIHooks.cpp" />
     <ClCompile Include="Cheat\Util\ClientUtil.cpp" />
+    <ClCompile Include="Cheat\Util\DumpingUtil.cpp" />
     <ClCompile Include="Cheat\Util\IL2CPPUtil.cpp" />
+    <ClCompile Include="Cheat\Util\StringUtil.cpp" />
     <ClCompile Include="kiero\kiero.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cheat\Core\Hooks\Detour.h" />
+    <ClInclude Include="Cheat\Core\Hooks\Detours\DetourCoreHooks.h" />
+    <ClInclude Include="Cheat\Core\Hooks\Detours\DetourInfiniteAmmo.h" />
     <ClInclude Include="Cheat\Core\Hooks\Detours\DetourUnityLogger.h" />
     <ClInclude Include="Cheat\Core\MethodHooks.h" />
     <ClInclude Include="Cheat\Core\UnityGame.h" />
@@ -267,13 +271,32 @@
     <ClInclude Include="Cheat\Logger\Logger.h" />
     <ClCompile Include="kiero\kiero.h" />
     <ClInclude Include="Cheat\Module\BKUCModule.h" />
+    <ClInclude Include="Cheat\Module\BKUCModuleContainer.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\AntiBarrierModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\BlinderModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\CriticalsModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\DebufferModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\FrostAuraModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\AOEBulletsModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\FullAutoModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\HeadshotMultiplierModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\InstantChargeModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\PiercerModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\RecoilModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Combat\SpreadModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\General\ScoreMultiplierModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Movement\BetterDashModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Movement\DoubleJumpModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Movement\FlyModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Player\ImmunityModule.h" />
+    <ClInclude Include="Cheat\Module\Impl\Player\InfiniteAmmoModule.h" />
     <ClInclude Include="Cheat\Offsets\Offsets.h" />
     <ClInclude Include="Cheat\UI\UIHooks.h" />
+    <ClInclude Include="Cheat\UI\UIHooksCategory.h" />
     <ClInclude Include="Cheat\Util\ClientUtil.h" />
+    <ClInclude Include="Cheat\Util\DumpingUtil.h" />
     <ClInclude Include="Cheat\Util\IL2CPPUtil.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Cheat\Module\Impl\" />
+    <ClInclude Include="Cheat\Util\StringUtil.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

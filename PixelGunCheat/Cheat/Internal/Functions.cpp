@@ -17,6 +17,20 @@ void Functions::init(uintptr_t game_base, uintptr_t game_assembly, uintptr_t uni
     UnityPlayer_ = unity_player;
 }
 
+// Below methods give me a headache, i have no fucking idea if they work yet LMFAO
+IL2CPPUtil::System_String* Functions::ConstructString(std::string str)
+{
+    static const auto fn = (IL2CPPUtil::System_String*(*)(IL2CPPUtil::il2cppArray<char>*))(GameAssembly_ + 0x37e7ac0);
+    auto char_arr = IL2CPPUtil::il2cppArray<char>();
+    char_arr.Insert(str.data(), str.size());
+    return fn(&char_arr);
+}
+
+IL2CPPUtil::System_String* Functions::ConstructStringAdv(std::string str)
+{
+    return reinterpret_cast<IL2CPPUtil::System_String*(__fastcall*)(void*, const char*)>(create_string)(get_domain(), str.data());
+}
+
 void Functions::SetNextHitCritical(void* arg, bool arg1)
 {
     if (!arg) return;
@@ -204,7 +218,7 @@ void Functions::ActivateGadget(void* arg, int gadget_id, int level)
 {
     if (!arg) return;
     static const auto fn = (void(*)(void*, int, void*, int))(GameAssembly_ + Offsets::GadgetActivate);
-    return fn(arg, gadget_id, (void*)0/*Hooks::create_system_string("IWouldNotLieThatThisIsARealStringForThisMethodCallBro")*/, level);
+    return fn(arg, gadget_id, (void*)ConstructStringAdv("IWouldNotLieThatThisIsARealStringForThisMethodCallBro"), level);
 }
 
 void Functions::DeactivateGadget(void* arg, int gadget_id)
@@ -212,13 +226,6 @@ void Functions::DeactivateGadget(void* arg, int gadget_id)
     if (!arg) return;
     static const auto fn = (void(*)(void*, int))(GameAssembly_ + Offsets::GadgetDeactivate);
     return fn(arg, gadget_id);
-}
-
-void* Functions::SystemObjectToString(void* arg)
-{
-    if (!arg) return nullptr;
-    static const auto fn = (void*(*)(void*))(GameAssembly_ + 0x3970900);
-    return fn(arg);
 }
 
 void* Functions::ProgressUpdaterGetInstance()
@@ -256,19 +263,4 @@ void Functions::CameraSetFov(void* arg, float fov)
 {
     static const auto fn = (void(*)(void*, float))(GameAssembly_ + Offsets::CameraSetFieldOfView);
     return fn(arg, fov); 
-}
-
-// Below methods give me a headache, i have no fucking idea if they work yet LMFAO
-
-IL2CPPUtil::System_String* Functions::ConstructString(std::string str)
-{
-    static const auto fn = (IL2CPPUtil::System_String*(*)(IL2CPPUtil::il2cppArray<char>*))(GameAssembly_ + 0x37e4210);
-    auto char_arr = IL2CPPUtil::il2cppArray<char>();
-    char_arr.Insert(str.data(), str.size());
-    return fn(&char_arr);
-}
-
-IL2CPPUtil::System_String* Functions::ConstructStringAdv(std::string str)
-{
-    return reinterpret_cast<IL2CPPUtil::System_String*(__fastcall*)(void*, const char*)>(create_string)(get_domain(), str.data());
 }

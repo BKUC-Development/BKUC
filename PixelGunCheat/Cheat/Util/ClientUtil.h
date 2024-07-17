@@ -13,6 +13,7 @@ public:
     static inline int window_display = -1;
     static inline bool has_font_changed = false;
     static inline bool ui_hooks_render = false;
+    static inline void* our_player = nullptr;
     
     static uint64_t tick;
     static uint64_t fixed_tick;
@@ -20,8 +21,6 @@ public:
     static float color_prog_offset;
     
     static void UpdateWinSize();
-    static std::string StrLow(std::string str);
-    static std::wstring WStrLow(std::wstring str);
     static std::string CleanString(std::string string);
     static std::string TokenizeString(std::string string, std::string token);
     static ImVec4 ColorToImVec4(std::vector<float> rgba);
@@ -34,4 +33,10 @@ public:
     static float GetFrameTime();
     static void* CreateCSString(std::string string);
     static void* CreateCSStringW(std::wstring string);
+    static std::string GetPlayerName(void* player);
+    static std::string GetPlayerNameWeaponSounds(void* weapon);
+    static void* GetPlayerTransform(void* player);
+    static bool IsEnemy(void* player);
+    static bool IsMyPlayer(void* player);
+    static bool IsMyPlayerWeaponSounds(void* weapon);
 };

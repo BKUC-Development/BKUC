@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+class InfiniteAmmoModule;
 class MethodHooks
 {
 public:

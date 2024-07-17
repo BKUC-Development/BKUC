@@ -328,7 +328,7 @@ int64_t WINAPI MainThread(LPVOID param)
     Logger::log_info("You like kissing boys don't you~~ ;3");
     Logger::log_info("");
     Logger::log_info("Currently using " + ClientUtil::client_name + " " + ClientUtil::client_ver);
-    Logger::log_info("Made with love (and several lost braincells) by @hiderikzki & @george2bush (@stanuwu)");
+    Logger::log_info("Made with love (and several lost braincells) by @hiderikzki (& formerly @george2bush (@stanuwu))");
     Logger::log_info("");
     
     Logger::log_info("Starting injection...");
@@ -384,7 +384,7 @@ int64_t WINAPI MainThread(LPVOID param)
     return 0;
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     if (ul_reason_for_call == DLL_PROCESS_ATTACH)
     {

@@ -1,9 +1,13 @@
 ﻿#pragma once
-
 #include <any>
 #include <map>
 #include <string>
-#include "../Util/ClientUtil.h"
+#include <vector>
+
+#include "BKUCModuleContainer.h"
+#include "../Logger/Logger.h"
+#include "../UI/UIHooksCategory.h"
+#include "../Util/StringUtil.h"
 
 class BKUCSetting;
 enum ParentState
@@ -35,12 +39,13 @@ public:
 class BKUCCheckbox : public BKUCSetting
 {
 public:
-    BKUCCheckbox(const std::string& _name, const bool checked, const std::string& _description = "")
+    BKUCCheckbox(const std::string& _name, const bool checked, const std::string& _description = "", const std::vector<ParentalConstraint>& _parents = {})
     {
         this->name = _name;
         this->checked = checked;
         this->description = _description;
         this->category = "General";
+        this->parents = _parents;
         this->type = 1;
     }
 
@@ -50,7 +55,7 @@ public:
 class BKUCSlider : public BKUCSetting
 {
 public:
-    BKUCSlider(const std::string& _name, const float _default, const float _min, const float _max, const std::string& _description = "")
+    BKUCSlider(const std::string& _name, const float _default, const float _min, const float _max, const std::string& _description = "", const std::vector<ParentalConstraint>& _parents = {})
     {
         this->name = _name;
         this->current = _default;
@@ -58,6 +63,7 @@ public:
         this->max = _max;
         this->description = _description;
         this->category = "General";
+        this->parents = _parents;
         this->type = 2;
     }
 
@@ -69,7 +75,7 @@ public:
 class BKUCSliderInt : public BKUCSetting
 {
 public:
-    BKUCSliderInt(const std::string& _name, const int _default, const int _min, const int _max, const std::string& _description = "")
+    BKUCSliderInt(const std::string& _name, const int _default, const int _min, const int _max, const std::string& _description = "", const std::vector<ParentalConstraint>& _parents = {})
     {
         this->name = _name;
         this->current = _default;
@@ -77,6 +83,7 @@ public:
         this->max = _max;
         this->description = _description;
         this->category = "General";
+        this->parents = _parents;
         this->type = 3;
     }
 
@@ -88,7 +95,7 @@ public:
 class BKUCDropdown : public BKUCSetting
 {
 public:
-    BKUCDropdown(const std::string& _name, const std::wstring& _default, const std::vector<std::wstring>& _values, const bool _allow_search, const std::string& _description = "")
+    BKUCDropdown(const std::string& _name, const std::wstring& _default, const std::vector<std::wstring>& _values, const bool _allow_search, const std::string& _description = "", const std::vector<ParentalConstraint>& _parents = {})
     {
         this->name = _name;
         this->current = _default;
@@ -97,6 +104,7 @@ public:
         this->allow_search = _allow_search;
         this->description = _description;
         this->category = "General";
+        this->parents = _parents;
         this->type = 4;
     }
 
@@ -117,9 +125,7 @@ public:
 class BKUCModule
 {
 public:
-    static inline std::vector<BKUCModule*> modules = {};
-    
-    BKUCModule(const std::string& name, const std::string& description, bool enabled, const UIHooksCategory category, const int key, const std::vector<BKUCSetting*>& settings)
+    BKUCModule(const std::string& name, const std::string& description, const UIHooksCategory category, const int key, bool enabled, const std::vector<BKUCSetting*>& settings)
     {
         this->name = name;
         this->description = description;
@@ -127,7 +133,7 @@ public:
         this->category = category;
         this->key = key;
         this->settings = settings;
-        modules.push_back(this);
+        BKUCModuleContainer::modules.push_back(this);
     }
 
     std::string name;
@@ -178,43 +184,31 @@ protected:
     {
         return *(int*)((uint64_t)arg + offset);
     }
-    
-};
-
-enum BKUCModuleInvocationType
-{
-    PLAYER_MOVE_C,
-    PLAYER_DAMAGEABLE,
-    WEAPON_SOUNDS,
-    PRE_RENDER,
-    GUI_2D_RENDER
 };
 
 class BKUCModuleUtil
 {
 public:
-    static inline std::map<BKUCModuleInvocationType, std::vector<BKUCModule*>> module_invocation_map = {};
-
     static void add_module_to_map(const BKUCModuleInvocationType type, BKUCModule* module)
     {
         std::vector<BKUCModule*> map_modules;
         
-        if (!module_invocation_map.contains(type))
+        if (!BKUCModuleContainer::module_invocation_map.contains(type))
         {
             map_modules = std::vector<BKUCModule*>();
             map_modules.push_back(module);
-            module_invocation_map.insert_or_assign(type, map_modules);
+            BKUCModuleContainer::module_invocation_map.insert_or_assign(type, map_modules);
         }
 
-        map_modules = module_invocation_map[type];
+        map_modules = BKUCModuleContainer::module_invocation_map[type];
         map_modules.push_back(module);
-        module_invocation_map.insert_or_assign(type, map_modules);
+        BKUCModuleContainer::module_invocation_map.insert_or_assign(type, map_modules);
     }
 
     static std::vector<BKUCModule*> get_modules_of_type(const BKUCModuleInvocationType type)
     {
-        if (!module_invocation_map.contains(type)) return {};
-        return module_invocation_map[type];
+        if (!BKUCModuleContainer::module_invocation_map.contains(type)) return {};
+        return BKUCModuleContainer::module_invocation_map[type];
     }
     
     static bool are_parents_enabled(const BKUCSetting* current)
@@ -285,7 +279,7 @@ public:
                 
                 switch (state)
                 {
-                case EQUAL_IGNORE_CASE: { if (ClientUtil::WStrLow(dropdown->current) == ClientUtil::WStrLow(applicable_status)) return false; break; }
+                case EQUAL_IGNORE_CASE: { if (StringUtil::WStrLow(dropdown->current) == StringUtil::WStrLow(applicable_status)) return false; break; }
                 case EQUAL: { if (dropdown->current == applicable_status) return false; break; }
                 case LESS_THAN:
                 case MORE_THAN:

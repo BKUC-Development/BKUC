@@ -9,9 +9,11 @@
 #include <sstream>
 #include <thread>
 
+#include "UIHooksCategory.h"
 #include "../Logger/Logger.h"
 #include "../Module/BKUCModule.h"
 #include "../Util/ClientUtil.h"
+#include "../Util/DumpingUtil.h"
 
 ImVec4 ImVec4i(const int r, const int g, const int b, const int a = 255)
 {
@@ -257,17 +259,17 @@ void DrawClientSettingsWindow(bool is_dx_11)
 
     if (ImGui::Button("Dump Item Records (Dev)"))
     {
-        // Hooks::dump_item_records();
+        DumpingUtil::DumpItemRecords();
     }
 
     ImGui::SameLine();
     
     if (ImGui::Button("Dump All Records (Dev)"))
     {
-        // Hooks::dump_all_records();
+        DumpingUtil::DumpFullRecordList();
     }
 
-    if (ImGui::Button("Send Test Notification"))
+    if (ImGui::Button("Send Test Notification (Dev)"))
     {
         /*
         ModuleNotifications::add_notification("Force Rejoin", "Detected a disconnection, trying to force rejoin... " + std::to_string(count), 3000);
@@ -329,7 +331,7 @@ void HandleModuleSettingRendering(BKUCModule& module)
 {
     std::string last_separator;
     
-    for (auto& setting : module.settings)
+    for (const auto& setting : module.settings)
     {
         if (setting->category != last_separator)
         {
@@ -376,7 +378,7 @@ void HandleModuleSettingRendering(BKUCModule& module)
                 
                 for (std::string::size_type i = 0; i < dropdown->values.size(); i++)
                 {
-                    if (!dropdown->allow_search || ClientUtil::StrLow(unwiden_string(dropdown->values[i])).find(ClientUtil::StrLow(dropdown->search_string)) != std::string::npos)
+                    if (!dropdown->allow_search || StringUtil::StrLow(unwiden_string(dropdown->values[i])).find(StringUtil::StrLow(dropdown->search_string)) != std::string::npos)
                     {
                         const bool selected = dropdown->current == dropdown->values[i];
                     
@@ -422,7 +424,7 @@ void HandleModuleRendering(BKUCModule& module)
 
 void HandleCategoryRendering(const std::string& name, const UIHooksCategory cat)
 {
-    for (const auto& module : BKUCModule::modules)
+    for (const auto& module : BKUCModuleContainer::modules)
     {
         if (module->category != cat) continue;
         HandleModuleRendering(*module);

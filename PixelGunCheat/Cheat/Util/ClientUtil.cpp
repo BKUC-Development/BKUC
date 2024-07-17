@@ -4,9 +4,9 @@
 #include <list>
 #include <sstream>
 
-#include "IL2CPPUtil.h"
 #include "../Internal/Functions.h"
 #include "../Logger/Logger.h"
+#include "../Offsets/Offsets.h"
 
 uint64_t ClientUtil::tick = 0;
 uint64_t ClientUtil::fixed_tick = 0;
@@ -16,18 +16,6 @@ float ClientUtil::color_prog_offset = 0;
 void ClientUtil::UpdateWinSize()
 {
     GetWindowRect(GetActiveWindow(), &ClientUtil::win_size_info);
-}
-
-std::string ClientUtil::StrLow(std::string str)
-{
-    std::ranges::transform(str, str.begin(), [](const unsigned char c){ return std::tolower(c); });
-    return str;
-}
-
-std::wstring ClientUtil::WStrLow(std::wstring str)
-{
-    std::ranges::transform(str, str.begin(), [](const unsigned char c){ return std::tolower(c); });
-    return str;
 }
 
 std::string ClientUtil::CleanString(std::string string)
@@ -157,4 +145,47 @@ void* ClientUtil::CreateCSStringW(std::wstring string)
     std::string s(string.begin(), string.end());
     IL2CPPUtil::System_String* ns = Functions::ConstructString(s);
     return ns;
+}
+
+std::string ClientUtil::GetPlayerName(void* player)
+{
+    if (player == nullptr) return "";
+    void* nick_label = (void*)*(uint64_t*)((uint64_t)player + Offsets::nickLabel);
+    void* name_ptr = Functions::TextMeshGetText(nick_label);
+    if (name_ptr == nullptr) return "";
+    std::string name = ((IL2CPPUtil::System_String*)name_ptr)->ToString();
+    return CleanString(name);
+}
+
+std::string ClientUtil::GetPlayerNameWeaponSounds(void* weapon)
+{
+    void* player = (void*)*(uint64_t*)((uint64_t)weapon + Offsets::weaponSoundsPlayerMoveC);
+    if (player == nullptr) return "";
+    return GetPlayerName(player);
+}
+
+void* ClientUtil::GetPlayerTransform(void* player)
+{
+    return (void*)*(uint64_t*)((uint64_t)player + Offsets::myPlayerTransform);
+}
+
+bool ClientUtil::IsEnemy(void* player)
+{
+    if (player == nullptr) return false;
+    void* nick_label = (void*)*(uint64_t*)((uint64_t)player + Offsets::nickLabel);
+    IL2CPPUtil::Color color = {0, 0,  0, 0};
+    Functions::TextMeshGetColor(nick_label, &color);
+    return color.r == 1 && color.g == 0 && color.b == 0;
+}
+
+bool ClientUtil::IsMyPlayer(void* player)
+{
+    return GetPlayerName(player) == "1111";
+}
+
+bool ClientUtil::IsMyPlayerWeaponSounds(void* weapon)
+{
+    void* player = (void*)*(uint64_t*)((uint64_t)weapon + Offsets::weaponSoundsPlayerMoveC);
+    if (player == nullptr) return false;
+    return IsMyPlayer(player);
 }

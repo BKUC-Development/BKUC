@@ -65,6 +65,8 @@ class Functions
 {
 public:
     static void init(uintptr_t game_base, uintptr_t game_assembly, uintptr_t unity_player);
+    static IL2CPPUtil::System_String* ConstructString(std::string str);
+    static IL2CPPUtil::System_String* ConstructStringAdv(std::string str);
     static void SetNextHitCritical(void* arg, bool arg1);
     static void MakeInvisibleForSeconds(void* arg, float duration);
     static void* TextMeshGetText(void* arg);
@@ -97,10 +99,7 @@ public:
     static void ProgressAddCurrency(void* instance, void* currency, int amount, int enum1, bool bool1, bool bool2, itemObtainParams* obtainParams);
     static void ActivateGadget(void* arg, int gadget_id, int level);
     static void DeactivateGadget(void* arg, int gadget_id);
-    static void* SystemObjectToString(void* arg);
     static ImVec4 ImVec4i(int r, int g, int b, int a = 255);
     static void* CameraGetMain();
     static void CameraSetFov(void* arg, float fov);
-    static IL2CPPUtil::System_String* ConstructString(std::string str);
-    static IL2CPPUtil::System_String* ConstructStringAdv(std::string str);
 };

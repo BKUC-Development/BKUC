@@ -18,7 +18,7 @@ void Detour::HookMethod(uint64_t offset, LPVOID detour, void* original)
     {
         const MH_STATUS enable_hook = MH_EnableHook(ga_offset);
         if (enable_hook == MH_OK) Logger::log_debug("MH_CreateHook && MH_EnableHook success on offset 0x" + hexified.str());
-        else Logger::log_err("MH_EnableHook failure on offset 0x" + hexified.str() + "! (Status: " + std::to_string(create_hook) + ")");
+        else Logger::log_err("MH_EnableHook failure on offset 0x" + hexified.str() + "! (Status: " + MH_StatusToString(enable_hook) + ")");
     }
-    else Logger::log_err("MH_CreateHook failure on offset 0x" + hexified.str() + "! (Status: " + std::to_string(create_hook) + ")");
+    else Logger::log_err("MH_CreateHook failure on offset 0x" + hexified.str() + "! (Status: " + MH_StatusToString(create_hook) + ")");
 }
